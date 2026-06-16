@@ -1,4 +1,4 @@
-# Discord Tesla RPC ⚡
+# Discord Tesla RPC
 
 Display real-time Tesla vehicle data on your Discord profile — speed, street name, battery, temperature, and more — like a FiveM or game server RPC.
 

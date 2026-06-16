@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+*.log
+.DS_Store
+private-key.pem
+com.tesla.3p.public-key.pem
+.wrangler/

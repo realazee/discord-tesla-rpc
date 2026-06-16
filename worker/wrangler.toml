@@ -1,0 +1,7 @@
+name = "tesla-discord-rpc"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# After deploying, add a custom domain in Cloudflare dashboard:
+# Workers & Pages → tesla-discord-rpc → Settings → Domains & Routes
+# Add: tesla-rpc.yourdomain.com

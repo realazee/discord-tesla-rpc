@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tesla Discord RPC</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app" id="app">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header-icon">⚡</div>
+      <div>
+        <h1>Tesla RPC</h1>
+        <p>Discord Rich Presence</p>
+      </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar" id="statusBar">
+      <span class="status-dot"></span>
+      <span id="statusText">Not connected</span>
+    </div>
+
+    <div class="scrollable">
+
+      <!-- ========================================================= -->
+      <!--  Configuration Card                                       -->
+      <!-- ========================================================= -->
+      <div class="card fade-in">
+        <div class="card-title">Configuration</div>
+
+        <div class="field">
+          <label for="teslaClientId">Tesla Client ID</label>
+          <input type="text" id="teslaClientId" placeholder="Enter Tesla Client ID">
+        </div>
+        <div class="field">
+          <label for="teslaClientSecret">Tesla Client Secret</label>
+          <input type="password" id="teslaClientSecret" placeholder="Enter Tesla Client Secret">
+        </div>
+        <div class="field">
+          <label for="teslaRegion">API Region</label>
+          <select id="teslaRegion">
+            <option value="na">North America</option>
+            <option value="eu">Europe</option>
+            <option value="cn">China</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="callbackDomain">Auth Callback Domain</label>
+          <input type="text" id="callbackDomain" placeholder="https://tesla-rpc.yourdomain.com">
+        </div>
+        <div class="field">
+          <label for="discordClientId">Discord Application ID</label>
+          <input type="text" id="discordClientId" placeholder="Enter Discord Client ID">
+        </div>
+        <div class="field">
+          <label for="units">Units</label>
+          <select id="units">
+            <option value="imperial">Imperial (mph, °F, mi)</option>
+            <option value="metric">Metric (km/h, °C, km)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!--  Tesla Account Card                                       -->
+      <!-- ========================================================= -->
+      <div class="card fade-in">
+        <div class="card-title">Tesla Account</div>
+
+        <div id="authSection">
+          <div class="btn-row">
+            <button class="btn btn-primary" id="btnLogin">Sign in with Tesla</button>
+            <button class="btn btn-secondary" id="btnLogout" style="display:none">Sign Out</button>
+          </div>
+        </div>
+
+        <div class="field" id="vehicleField" style="display:none; margin-top: 12px;">
+          <label for="vehicleSelect">Vehicle</label>
+          <select id="vehicleSelect">
+            <option value="">Select a vehicle…</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!--  RPC Control                                               -->
+      <!-- ========================================================= -->
+      <div class="card fade-in">
+        <div class="card-title">Rich Presence</div>
+        <div class="btn-row">
+          <button class="btn btn-success" id="btnStart">▶ Start RPC</button>
+          <button class="btn btn-secondary" id="btnStop" disabled>■ Stop RPC</button>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!--  Metric Toggles Card                                      -->
+      <!-- ========================================================= -->
+      <div class="card fade-in">
+        <div class="card-title">Display Metrics</div>
+
+        <div class="toggle-row" data-metric="speed">
+          <div class="toggle-label"><span class="icon">🏎️</span> Speed</div>
+          <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row" data-metric="street">
+          <div class="toggle-label"><span class="icon">🛣️</span> Street Name</div>
+          <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row" data-metric="location">
+          <div class="toggle-label"><span class="icon">📍</span> City / State</div>
+          <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row" data-metric="gear">
+          <div class="toggle-label"><span class="icon">⚙️</span> Gear</div>
+          <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row" data-metric="battery">
+          <div class="toggle-label"><span class="icon">🔋</span> Battery %</div>
+          <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row" data-metric="range">
+          <div class="toggle-label"><span class="icon">⚡</span> Range</div>
+          <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row" data-metric="charging">
+          <div class="toggle-label"><span class="icon">🔌</span> Charging Status</div>
+          <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row" data-metric="insideTemp">
+          <div class="toggle-label"><span class="icon">🌡️</span> Inside Temp</div>
+          <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row" data-metric="outsideTemp">
+          <div class="toggle-label"><span class="icon">🌤️</span> Outside Temp</div>
+          <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row" data-metric="odometer">
+          <div class="toggle-label"><span class="icon">📏</span> Odometer</div>
+          <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row" data-metric="sentry">
+          <div class="toggle-label"><span class="icon">🛡️</span> Sentry Mode</div>
+          <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!--  Live Preview Card                                        -->
+      <!-- ========================================================= -->
+      <div class="card fade-in">
+        <div class="card-title">Discord Preview</div>
+        <div class="preview" id="preview">
+          <div class="preview-image">
+            🚗
+            <div class="small-icon">🅿️</div>
+          </div>
+          <div class="preview-info">
+            <div class="preview-title">Tesla RPC</div>
+            <div class="preview-details" id="previewDetails">Waiting for data…</div>
+            <div class="preview-state" id="previewState"></div>
+            <div class="preview-elapsed" id="previewElapsed">00:00 elapsed</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!--  Live Data Card                                           -->
+      <!-- ========================================================= -->
+      <div class="card fade-in" id="dataCard" style="display:none">
+        <div class="card-title">Live Vehicle Data</div>
+        <div class="data-grid" id="dataGrid"></div>
+      </div>
+
+    </div><!-- / scrollable -->
+  </div><!-- / app -->
+
+  <script src="renderer.js"></script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "name": "discord-tesla-rpc",
+  "version": "1.0.0",
+  "description": "Display Tesla vehicle data as Discord Rich Presence — speed, street, battery, and more.",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev"
+  },
+  "author": "azee",
+  "license": "MIT",
+  "dependencies": {
+    "@xhayper/discord-rpc": "^1.2.0",
+    "electron-store": "^8.2.0",
+    "open": "^10.1.0"
+  },
+  "devDependencies": {
+    "electron": "^33.4.11"
+  },
+  "allowScripts": {
+    "electron@33.4.11": true
+  }
+}

@@ -23,24 +23,27 @@ echo ""
 
 # --- 1. Virtual display ---
 echo "[1/5] Starting virtual display..."
-Xvfb :99 -screen 0 1024x768x24 -ac &
+Xvfb :99 -screen 0 1024x768x24 -ac +extension GLX +render -noreset &>/dev/null &
 sleep 1
 
-# --- 2. Window manager ---
+# --- 2. Window manager (suppress config spam) ---
 echo "[2/5] Starting window manager..."
-fluxbox &
+fluxbox &>/dev/null &
 sleep 1
 
 # --- 3. VNC + noVNC for browser access ---
 echo "[3/5] Starting VNC server..."
-x11vnc -display :99 -nopw -listen 0.0.0.0 -rfbport 5900 -forever -shared -bg
-echo "[3/5] Starting noVNC web interface on port 6080..."
-/opt/noVNC/utils/novnc_proxy --vnc localhost:5900 --listen 6080 &
+x11vnc -display :99 -nopw -listen 0.0.0.0 -rfbport 5900 -forever -shared -bg -q 2>/dev/null
+/opt/noVNC/utils/novnc_proxy --vnc localhost:5900 --listen 6080 &>/dev/null &
 sleep 1
 
 # --- 4. Discord ---
 echo "[4/5] Starting Discord..."
-# Disable auto-update prompts and hardware acceleration
+
+# Start D-Bus session bus (prevents dbus connection spam)
+eval $(dbus-launch --sh-syntax) 2>/dev/null || true
+
+# Disable auto-update prompts
 mkdir -p /root/.config/discord
 cat > /root/.config/discord/settings.json <<EOF
 {
@@ -51,8 +54,7 @@ cat > /root/.config/discord/settings.json <<EOF
 }
 EOF
 
-discord --no-sandbox &
-DISCORD_PID=$!
+discord --no-sandbox &>/dev/null &
 
 echo ""
 echo "╔══════════════════════════════════════════════════╗"
@@ -67,26 +69,9 @@ echo "║  After that, Discord stays logged in.           ║"
 echo "╚══════════════════════════════════════════════════╝"
 echo ""
 
-# Wait for Discord IPC socket to appear
-echo "[4/5] Waiting for Discord IPC socket..."
-ATTEMPTS=0
-MAX_ATTEMPTS=60
-while [ $ATTEMPTS -lt $MAX_ATTEMPTS ]; do
-  # Check common socket locations
-  if ls /tmp/discord-ipc-* 2>/dev/null 1>&2 || \
-     ls "$XDG_RUNTIME_DIR/discord-ipc-*" 2>/dev/null 1>&2; then
-    echo "[4/5] ✅ Discord IPC socket found!"
-    break
-  fi
-  ATTEMPTS=$((ATTEMPTS + 1))
-  sleep 2
-done
-
-if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
-  echo "⚠ Discord IPC socket not found after ${MAX_ATTEMPTS} attempts."
-  echo "  Make sure Discord is logged in via the VNC interface."
-  echo "  The RPC app will keep retrying..."
-fi
+# Give Discord time to start and create its IPC socket
+echo "[4/5] Waiting 15s for Discord to initialize..."
+sleep 15
 
 # --- 5. Node.js RPC app ---
 echo "[5/5] Starting Tesla RPC service..."

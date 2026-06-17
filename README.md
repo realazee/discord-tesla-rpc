@@ -110,12 +110,24 @@ The container includes a browser-accessible VNC interface for the initial Discor
 2. You'll see the Discord login screen — sign in with your account
 3. Once logged in, Discord stays authenticated across container restarts
 
-The Tesla OAuth flow prints a URL to the container logs:
+For Tesla OAuth, set your Cloudflare Worker to redirect to the Docker container instead of localhost:
+
+```bash
+# Tell the Worker to redirect OAuth callbacks to your homelab
+cd worker
+echo "http://<your-server-ip>:8888" | npx wrangler secret put CALLBACK_HOST
+npx wrangler deploy
+```
+
+Then check the container logs for the Tesla auth URL:
 
 ```bash
 docker compose logs -f
 # Copy the Tesla auth URL and open it in any browser
+# After authorizing, Tesla redirects → Cloudflare Worker → your homelab:8888
 ```
+
+> **Desktop users**: Don't set `CALLBACK_HOST` — the Worker defaults to `localhost:8888` which is correct when the app and browser are on the same machine.
 
 ### Environment Variables
 

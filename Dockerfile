@@ -21,11 +21,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 python3-numpy \
     # Discord dependencies
     libgtk-3-0 libnotify4 libnss3 libxss1 libxtst6 xdg-utils \
-    libatspi2.0-0 libsecret-1-0 libgbm1 libasound2 \
+    libatspi2.0-0 libsecret-1-0 libgbm1 libasound2 libpulse0 \
     libdrm2 libxshmfence1 libgl1-mesa-glx \
     fonts-liberation fonts-noto-color-emoji \
     # Utilities
-    wget curl ca-certificates procps \
+    wget curl ca-certificates procps dbus-x11 \
     && rm -rf /var/lib/apt/lists/*
 
 # ── Install noVNC ────────────────────────────────────────────

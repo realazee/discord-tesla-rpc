@@ -54,7 +54,10 @@ cat > /root/.config/discord/settings.json <<EOF
 }
 EOF
 
-discord --no-sandbox &>/dev/null &
+# Clear GPU cache (prevents stale state from causing hangs)
+rm -rf /root/.config/discord/GPUCache /root/.config/discord/Cache 2>/dev/null || true
+
+discord --no-sandbox --disable-gpu --disable-software-rasterizer --disable-gpu-compositing &>/dev/null &
 
 echo ""
 echo "╔══════════════════════════════════════════════════╗"

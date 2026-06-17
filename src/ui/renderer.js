@@ -33,7 +33,8 @@ const configInputs = {
   teslaRegion:       $('#teslaRegion'),
   callbackDomain:    $('#callbackDomain'),
   discordClientId:   $('#discordClientId'),
-  units:             $('#units'),
+  speedUnits:         $('#speedUnits'),
+  tempUnits:           $('#tempUnits'),
 };
 
 /* ------------------------------------------------------------------ */
@@ -232,7 +233,7 @@ window.api.onVehicleData(({ vehicleData, geoData, isDriving }) => {
 function updatePreview(data, geo, isDriving) {
   const ds = data.drive_state || {};
   const cs = data.charge_state || {};
-  const units = configInputs.units.value;
+  const speedUnits = configInputs.speedUnits.value;
 
   // Build details line (mirrors Discord RPC logic)
   const line1 = [];
@@ -245,7 +246,7 @@ function updatePreview(data, geo, isDriving) {
   };
 
   if (getToggle('speed') && ds.speed != null) {
-    line1.push(units === 'metric' ? `${Math.round(ds.speed * 1.60934)} km/h` : `${ds.speed} mph`);
+    line1.push(speedUnits === 'kph' ? `${Math.round(ds.speed * 1.60934)} km/h` : `${ds.speed} mph`);
   }
   if (getToggle('gear')) {
     const gearMap = { D: 'Drive', R: 'Reverse', N: 'Neutral', P: 'Parked' };
@@ -262,7 +263,7 @@ function updatePreview(data, geo, isDriving) {
     line2.push(`🔋 ${cs.battery_level}%`);
   }
   if (getToggle('range') && cs.battery_range != null) {
-    const r = units === 'metric' ? `${Math.round(cs.battery_range * 1.60934)} km` : `${Math.round(cs.battery_range)} mi`;
+    const r = speedUnits === 'kph' ? `${Math.round(cs.battery_range * 1.60934)} km` : `${Math.round(cs.battery_range)} mi`;
     line2.push(`⚡ ${r}`);
   }
 
@@ -281,15 +282,17 @@ function updateDataGrid(data, geo) {
   const cs = data.charge_state || {};
   const cl = data.climate_state || {};
   const vs = data.vehicle_state || {};
-  const units = configInputs.units.value;
+  const speedUnits = configInputs.speedUnits.value;
+  const tempUnits = configInputs.tempUnits.value;
 
   const items = [
-    { label: 'Speed', value: ds.speed != null ? (units === 'metric' ? `${Math.round(ds.speed * 1.60934)} km/h` : `${ds.speed} mph`) : '—' },
+    { label: 'Speed', value: ds.speed != null ? (speedUnits === 'kph' ? `${Math.round(ds.speed * 1.60934)} km/h` : `${ds.speed} mph`) : '—' },
     { label: 'Gear', value: { D: 'Drive', R: 'Reverse', N: 'Neutral', P: 'Park' }[ds.shift_state] || 'Park' },
     { label: 'Battery', value: cs.battery_level != null ? `${cs.battery_level}%` : '—' },
-    { label: 'Range', value: cs.battery_range != null ? (units === 'metric' ? `${Math.round(cs.battery_range * 1.60934)} km` : `${Math.round(cs.battery_range)} mi`) : '—' },
-    { label: 'Inside', value: cl.inside_temp != null ? (units === 'metric' ? `${Math.round(cl.inside_temp)}°C` : `${Math.round(cl.inside_temp * 9 / 5 + 32)}°F`) : '—' },
-    { label: 'Outside', value: cl.outside_temp != null ? (units === 'metric' ? `${Math.round(cl.outside_temp)}°C` : `${Math.round(cl.outside_temp * 9 / 5 + 32)}°F`) : '—' },
+    { label: 'Range', value: cs.battery_range != null ? (speedUnits === 'kph' ? `${Math.round(cs.battery_range * 1.60934)} km` : `${Math.round(cs.battery_range)} mi`) : '—' },
+    { label: 'Charging', value: cs.charger_power != null && cs.charging_state === 'Charging' ? `${cs.charger_power} kW` : '—' },
+    { label: 'Inside', value: cl.inside_temp != null ? (tempUnits === 'C' ? `${Math.round(cl.inside_temp)}°C` : `${Math.round(cl.inside_temp * 9 / 5 + 32)}°F`) : '—' },
+    { label: 'Outside', value: cl.outside_temp != null ? (tempUnits === 'C' ? `${Math.round(cl.outside_temp)}°C` : `${Math.round(cl.outside_temp * 9 / 5 + 32)}°F`) : '—' },
     { label: 'Street', value: geo.street || '—' },
     { label: 'Location', value: geo.city ? (geo.state ? `${geo.city}, ${geo.state}` : geo.city) : '—' },
   ];

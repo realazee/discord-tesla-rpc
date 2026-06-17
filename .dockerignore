@@ -1,5 +1,5 @@
 node_modules/
-dist/
+.git/
 .env
 *.log
 .DS_Store
@@ -8,3 +8,7 @@ com.tesla.3p.public-key.pem
 .wrangler/
 .tokens.json
 data/
+worker/
+dist/
+README.md
+docker-compose.yml

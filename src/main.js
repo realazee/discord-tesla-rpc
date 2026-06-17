@@ -34,7 +34,8 @@ const store = new Store({
       callbackDomain: '', // e.g. 'https://tesla-rpc.yourdomain.com'
       discordClientId: '',
       selectedVin: '',
-      units: 'imperial', // 'imperial' | 'metric'
+      speedUnits: 'mph', // 'mph' | 'kph'
+      tempUnits: 'F', // 'F' | 'C'
     },
     toggles: Object.fromEntries(METRIC_KEYS.map((k) => [k, true])),
   },
@@ -208,8 +209,9 @@ async function startRPC() {
 
     // Update Discord
     const toggles = store.get('toggles');
-    const units = store.get('config.units', 'imperial');
-    discord.updatePresence(vehicleData, latestGeoData, toggles, { units });
+    const speedUnits = store.get('config.speedUnits', 'mph');
+    const tempUnits = store.get('config.tempUnits', 'F');
+    discord.updatePresence(vehicleData, latestGeoData, toggles, { speedUnits, tempUnits });
 
     // Push to UI
     sendToRenderer('vehicle-data', {
@@ -306,8 +308,9 @@ function setupIPC() {
     // Immediately re-render with latest data
     if (rpcActive && discord && latestVehicleData) {
       const toggles = store.get('toggles');
-      const units = store.get('config.units', 'imperial');
-      discord.updatePresence(latestVehicleData, latestGeoData, toggles, { units });
+      const speedUnits = store.get('config.speedUnits', 'mph');
+      const tempUnits = store.get('config.tempUnits', 'F');
+      discord.updatePresence(latestVehicleData, latestGeoData, toggles, { speedUnits, tempUnits });
     }
     return true;
   });

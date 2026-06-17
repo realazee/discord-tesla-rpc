@@ -75,12 +75,13 @@ class DiscordRPC {
    * @param {object} vehicleData — raw Tesla vehicle_data response
    * @param {object} geoData — { street, city, state } from geocoder
    * @param {Record<string, boolean>} toggles — which metrics are enabled
-   * @param {object} opts — { units: 'imperial'|'metric' }
+   * @param {object} opts — { speedUnits: 'mph'|'kph', tempUnits: 'F'|'C' }
    */
   updatePresence(vehicleData, geoData, toggles, opts = {}) {
     if (!this._connected || !this.client.user) return;
 
-    const units = opts.units || 'imperial';
+    const speedUnits = opts.speedUnits || 'mph';
+    const tempUnits = opts.tempUnits || 'F';
     const ds = vehicleData.drive_state || {};
     const cs = vehicleData.charge_state || {};
     const cl = vehicleData.climate_state || {};
@@ -97,7 +98,7 @@ class DiscordRPC {
     const line1Parts = [];
 
     if (toggles.speed && ds.speed != null) {
-      const speed = units === 'metric'
+      const speed = speedUnits === 'kph'
         ? `${Math.round(ds.speed * 1.60934)} km/h`
         : `${ds.speed} mph`;
       line1Parts.push(speed);
@@ -128,35 +129,33 @@ class DiscordRPC {
     }
 
     if (toggles.range && cs.battery_range != null) {
-      const range = units === 'metric'
+      const range = speedUnits === 'kph'
         ? `${Math.round(cs.battery_range * 1.60934)} km`
         : `${Math.round(cs.battery_range)} mi`;
       line2Parts.push(`⚡ ${range}`);
     }
 
     if (toggles.charging && isCharging) {
-      const rate = cs.charge_rate
-        ? ` @ ${cs.charge_rate} ${units === 'metric' ? 'km/h' : 'mph'}`
-        : '';
-      line2Parts.push(`🔌 Charging${rate}`);
+      const kw = cs.charger_power != null ? ` @ ${cs.charger_power} kW` : '';
+      line2Parts.push(`🔌 Charging${kw}`);
     }
 
     if (toggles.insideTemp && cl.inside_temp != null) {
-      const temp = units === 'metric'
+      const temp = tempUnits === 'C'
         ? `${Math.round(cl.inside_temp)}°C`
         : `${Math.round(cl.inside_temp * 9 / 5 + 32)}°F`;
       line2Parts.push(`🌡️ ${temp} in`);
     }
 
     if (toggles.outsideTemp && cl.outside_temp != null) {
-      const temp = units === 'metric'
+      const temp = tempUnits === 'C'
         ? `${Math.round(cl.outside_temp)}°C`
         : `${Math.round(cl.outside_temp * 9 / 5 + 32)}°F`;
       line2Parts.push(`${temp} out`);
     }
 
     if (toggles.odometer && vs.odometer != null) {
-      const odo = units === 'metric'
+      const odo = speedUnits === 'kph'
         ? `${Math.round(vs.odometer * 1.60934).toLocaleString()} km`
         : `${Math.round(vs.odometer).toLocaleString()} mi`;
       line2Parts.push(`📏 ${odo}`);

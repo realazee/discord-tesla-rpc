@@ -7,7 +7,7 @@
     "start": "electron .",
     "dev": "electron . --dev"
   },
-  "author": "azee",
+  "author": "realazee",
   "license": "MIT",
   "dependencies": {
     "@xhayper/discord-rpc": "^1.2.0",

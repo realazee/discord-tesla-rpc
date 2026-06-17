@@ -3,15 +3,18 @@
  *
  * Handles two things:
  *   1. Serves the public key at /.well-known/appspecific/com.tesla.3p.public-key.pem
- *   2. Redirects OAuth callbacks to localhost (bounces the auth code back to the Electron app)
+ *   2. Redirects OAuth callbacks to the app (localhost or a remote host)
  *
  * Setup:
  *   1. npx wrangler deploy
  *   2. Set your public key:  npx wrangler secret put TESLA_PUBLIC_KEY
  *      (paste the full PEM contents including BEGIN/END lines)
+ *
+ * For Docker / headless deployments:
+ *   3. Set the callback host:  npx wrangler secret put CALLBACK_HOST
+ *      (e.g. "http://192.168.1.50:8888" — your homelab's LAN IP)
+ *      If not set, defaults to http://localhost:8888
  */
-
-const LOCAL_CALLBACK = 'http://localhost:8888/callback';
 
 export default {
   async fetch(request, env) {
@@ -32,10 +35,10 @@ export default {
 
     // --- OAuth callback redirect ---
     if (url.pathname === '/callback') {
-      // Preserve all query params (code, state, etc.) and bounce to localhost
-      const localUrl = `${LOCAL_CALLBACK}${url.search}`;
+      // Use CALLBACK_HOST if set (for Docker), otherwise localhost
+      const callbackHost = (env.CALLBACK_HOST || 'http://localhost:8888').replace(/\/$/, '');
+      const localUrl = `${callbackHost}/callback${url.search}`;
 
-      // Return a page that redirects + shows a fallback link
       const html = `<!DOCTYPE html>
 <html><head><meta charset="utf-8">
 <meta http-equiv="refresh" content="0;url=${localUrl}">
@@ -68,3 +71,4 @@ export default {
     return new Response('Not found', { status: 404 });
   },
 };
+
